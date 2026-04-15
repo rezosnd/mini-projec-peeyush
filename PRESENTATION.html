@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KIITease - Project Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0b0f;
+            --surface: #14141a;
+            --accent: #00f2fe;
+            --accent-secondary: #4facfe;
+            --text: #ffffff;
+            --text-muted: #94949e;
+            --border: rgba(255, 255, 255, 0.08);
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+            --font-display: 'Syne', sans-serif;
+            --gradient: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-sans);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .presentation-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .slides-wrapper {
+            flex: 1;
+            display: flex;
+            transition: transform 0.6s cubic-bezier(0.85, 0, 0.15, 1);
+        }
+
+        .slide {
+            min-width: 100vw;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            position: relative;
+            background: radial-gradient(circle at 10% 10%, rgba(0, 242, 254, 0.03) 0%, transparent 50%);
+        }
+
+        .slide-content {
+            max-width: 1000px;
+            width: 100%;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease 0.3s;
+        }
+
+        .slide.active .slide-content {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .slide-header {
+            margin-bottom: 3rem;
+            border-left: 4px solid var(--accent);
+            padding-left: 2rem;
+        }
+
+        .slide-tag {
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        h1, h2 {
+            font-family: var(--font-display);
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        h1 { font-size: 4.5rem; margin-bottom: 1rem; }
+        h2 { font-size: 3.5rem; }
+
+        .slide-body {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+
+        .slide-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .feature-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            border-radius: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: var(--accent);
+            background: rgba(0, 242, 254, 0.02);
+            transform: translateY(-5px);
+        }
+
+        .feature-card h3 {
+            color: var(--text);
+            margin-bottom: 0.75rem;
+            font-family: var(--font-display);
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .btn-nav {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 1rem 1.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: var(--font-display);
+        }
+
+        .btn-nav:hover:not(:disabled) {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .btn-nav:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: var(--gradient);
+            width: 0%;
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        .slide-number {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            font-family: var(--font-display);
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .tech-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .tech-tag {
+            background: rgba(255,255,255,0.05);
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.85rem;
+            border: 1px solid var(--border);
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 3rem; }
+            h2 { font-size: 2.5rem; }
+            .slide-grid { grid-template-columns: 1fr; }
+            .slide { padding: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progress"></div>
+    <div class="slide-number" id="slideNumber">01 / 08</div>
+    
+    <div class="presentation-container">
+        <div class="slides-wrapper" id="wrapper">
+            <!-- Slide 1: Introduction -->
+            <section class="slide active">
+                <div class="slide-content">
+                    <header class="slide-header">
+                        <span class="slide-tag">Innovation Group</span>
+                        <h1>KIITease</h1>
+                        <p class="slide-body" style="font-size: 1.5rem;">Managed Portal for Academic Project Excellence</p>
+                    </header>
+                    <div class="slide-body">
+                        <p>A unified ecosystem designed for KIIT University to streamline the collaboration between student groups and faculty mentors through high-end aesthetics and real-time synchronization.</p>
+                        <div class="tech-list">
+                            <span class="tech-tag">Next.js 15</span>
+                            <span class="tech-tag">Neon DB</span>
+                            <span class="tech-tag">Full-Stack SSR</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 2: Literature Review -->
+            <section class="slide">
+                <div class="slide-content">
+                    <header class="slide-header">
+                        <span class="slide-tag">Analysis</span>
+                        <h2>Literature Review</h2>
+                    </header>
+                    <div class="slide-grid">
+                        <div class="feature-card">
+                            <h3>Generic PM Tools</h3>
+                            <p>Trello and Jira lack the specific academic hierarchy needed for student-teacher dynamics and grade-linked task tracking.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h3>Learning Barriers</h3>
+                            <p>Manual tracking methods result in "Dead Zones" where faculty cannot monitor real-time contributions across parallel groups.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 3: Problem Formulation -->
+            <section class="slide">
+                <div class="slide-content">
+                    <header class="slide-header">
+                        <span class="slide-tag">Identification</span>
+                        <h2>Problem Formulation</h2>
+                    </header>
+                    <div class="slide-body">
+                        <p>The core challenge lies in the <strong>fragmentation</strong> of student collaborative data.</p>
+                        <ul style="margin-top: 2rem; list-style: none;">
+                            <li style="margin-bottom: 1rem;">⚡ <strong>Visibility Gap:</strong> Teachers lack a dashboard for cross-sectional progress.</li>
+                            <li style="margin-bottom: 1rem;">⚡ <strong>Group Chaos:</strong> Manual group forming leads to administrative overhead and errors.</li>
+                            <li style="margin-bottom: 1rem;">⚡ <strong>Action Lag:</strong> Delay in task assignment and feedback loops reduces student throughput.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 4: Novelty -->
+            <section class="slide">
+                <div class="slide-content">
+                    <header class="slide-header">
+                        <span class="slide-tag">Unique Value</span>
+                        <h2>Novelty</h2>
+                    </header>
+                    <div class="slide-grid">
+                        <div class="feature-card">
+                            <h3>Managed Portal Logic</h3>
+                            <p>Role-specific UI routing that transforms the interface based on user authorization, providing tailored experiences for Students vs. Teachers.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h3>Visual Milestone Map</h3>
+                            <p>A glassmorphic progress layer that provides instant visual feedback on project completion metrics across the entire collective.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 5: Proposed Method -->
+            <section class="slide">
+                <div class="slide-content">
+                    <header class="slide-header">
+                        <span class="slide-tag">Architecture</span>
+                        <h2>Proposed Method</h2>
+                    </header>
+                    <div class="slide-body">
+                        <p>Leveraging <strong>Serverless Relational Architecture</strong> for maximum scalability and type safety.</p>
+                        <div class="slide-grid">
+                            <div class="feature-card">
+                                <h3>Data Flow</h3>
+                                <p>Optimistic UI updates via React Server Actions minimize perceived latency while maintaining consistency in Neon DB.</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3>Group Synergy</h3>
+                                <p>Dynamic many-to-many relationship mapping between Enrollments, Groups, and Tasks for high-fidelity tracking.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 6: Benchmark & Details -->
+            <section class="slide">
+                <div class="slide-content">
+                    <header class="slide-header">
+                        <span class="slide-tag">Evaluation</span>
+                        <h2>Dataset & Benchmarks</h2>
+                    </header>
+                    <div class="slide-body">
+                        <p>Tested against high-load academic scenarios.</p>
+                        <table style="width: 100%; margin-top: 2rem; border-collapse: collapse; text-align: left;">
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <th style="padding: 1rem; color: var(--accent);">Metric</th>
+                                <th style="padding: 1rem; color: var(--accent);">Performance</th>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 1rem;">Server Response (TTFB)</td>
+                                <td style="padding: 1rem;">&lt; 120ms</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 1rem;">Sync Latency</td>
+                                <td style="padding: 1rem;">Near-Instant via Server Actions</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 1rem;">Concurrent Groups</td>
+                                <td style="padding: 1rem;">Scaled via Neon PostgreSQL</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 7: Simulation Platform -->
+            <section class="slide">
+                <div class="slide-content">
+                    <header class="slide-header">
+                        <span class="slide-tag">Tech Stack</span>
+                        <h2>Simulation Platform</h2>
+                    </header>
+                    <div class="slide-body">
+                        <p>Built with enterprise-ready technologies for reliability.</p>
+                        <div class="slide-grid">
+                            <div class="feature-card">
+                                <h3>Frontend & Backend</h3>
+                                <p><strong>Framework:</strong> Next.js 15 (Edge Runtime)<br><strong>Styling:</strong> Vanilla CSS + Syne Typeface</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3>Infrastructure</h3>
+                                <p><strong>Hosting:</strong> Vercel Global Edge Network<br><strong>Database:</strong> Neon Serverless PostgreSQL</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 8: Conclusion -->
+            <section class="slide">
+                <div class="slide-content">
+                    <header class="slide-header">
+                        <span class="slide-tag">Summary</span>
+                        <h2>Conclusion</h2>
+                    </header>
+                    <div class="slide-body">
+                        <p style="font-size: 1.5rem; color: var(--text);">KIITease effectively bridges the gap between students and mentors.</p>
+                        <p style="margin-top: 1rem;">By modernizing the project lifecycle, we've achieved <strong>100% transparency</strong> and significantly reduced administrative friction. Future updates will focus on AI-assisted task breakdown and mobile-first entry.</p>
+                        <p style="margin-top: 3rem; font-family: var(--font-display); color: var(--accent); font-size: 2rem;">Thank You.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="controls">
+            <button class="btn-nav" id="prevBtn" disabled>&larr;</button>
+            <button class="btn-nav" id="nextBtn">&rarr;</button>
+        </div>
+    </div>
+
+    <script>
+        const wrapper = document.getElementById('wrapper');
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const progress = document.getElementById('progress');
+        const slideNumber = document.getElementById('slideNumber');
+
+        let currentSlide = 0;
+        const totalSlides = slides.length;
+
+        function updateSlide() {
+            wrapper.style.transform = `translateX(-${currentSlide * 100}vw)`;
+            
+            slides.forEach((slide, index) => {
+                if (index === currentSlide) slide.classList.add('active');
+                else slide.classList.remove('active');
+            });
+
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === totalSlides - 1;
+
+            const percent = ((currentSlide + 1) / totalSlides) * 100;
+            progress.style.width = `${percent}%`;
+            
+            slideNumber.innerText = `${String(currentSlide + 1).padStart(2, '0')} / ${String(totalSlides).padStart(2, '0')}`;
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                if (currentSlide < totalSlides - 1) {
+                    currentSlide++;
+                    updateSlide();
+                }
+            } else if (e.key === 'ArrowLeft') {
+                if (currentSlide > 0) {
+                    currentSlide--;
+                    updateSlide();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KIIT Mini Project Management System - Documentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f0e13;
+            --fg: #ffffff;
+            --card: #1c1b22;
+            --border: rgba(255, 255, 255, 0.1);
+            --muted-fg: #94949e;
+            --accent: #00f2fe;
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+            --font-display: 'Syne', sans-serif;
+        }
+
+        @media print {
+            body { background: white !important; color: black !important; }
+            .card { border: 1px solid #eee !important; box-shadow: none !important; background: white !important; }
+            .badge { border: 1px solid #ccc !important; color: black !important; }
+            .no-print { display: none; }
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--fg);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            padding: 4rem 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 3rem;
+        }
+
+        .system-tag {
+            font-family: var(--font-display);
+            font-size: 0.8rem;
+            letter-spacing: 0.3em;
+            color: var(--muted-fg);
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        h1 {
+            font-family: var(--font-display);
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin: 0;
+            line-height: 1;
+        }
+
+        h2 {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            color: var(--accent);
+            margin-top: 4rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            margin-top: 2rem;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+        }
+
+        th {
+            text-align: left;
+            font-family: var(--font-display);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--muted-fg);
+            padding: 1rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.95rem;
+        }
+
+        .badge {
+            background: rgba(255,255,255,0.05);
+            padding: 0.3rem 0.8rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        footer {
+            margin-top: 6rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--muted-fg);
+            border-top: 1px solid var(--border);
+            padding-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <span class="system-tag">Technical Specification</span>
+        <h1>KIIT Mini Project Management System</h1>
+        <p style={{marginTop: '1rem', color: 'var(--muted-fg)'}}>Official Documentation & User Guide</p>
+    </header>
+
+    <section>
+        <h2>1. Executive Summary</h2>
+        <p>The KIIT Mini Project Management System is a premium, "Managed Portal" designed to streamline the project lifecycle for students and faculty. It combines high-end aesthetics with robust collaboration tools, facilitating seamless task management, group coordination, and progress tracking.</p>
+    </section>
+
+    <section>
+        <h2>2. Technology Stack</h2>
+        <p>The system leverages a modern, serverless, and type-safe architecture.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Layer</th>
+                    <th>Technology</th>
+                    <th>Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Framework</td>
+                    <td>Next.js 15 (App Router)</td>
+                    <td>SSR, Routing, Server Actions</td>
+                </tr>
+                <tr>
+                    <td>Database</td>
+                    <td>Neon PostgreSQL</td>
+                    <td>Relational Data & Integrity</td>
+                </tr>
+                <tr>
+                    <td>Security</td>
+                    <td>Jose (JWT) + Bcrypt</td>
+                    <td>Auth & Data Protection</td>
+                </tr>
+                <tr>
+                    <td>Design</td>
+                    <td>Vanilla CSS + Syne</td>
+                    <td>Premium Managed UI</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2>3. Key Features</h2>
+        <div class="card">
+            <h3>Collaboration Nodes</h3>
+            <p>Students can form persistent groups, allowing for unified project submissions and collective progress tracking. Teachers can target assignments to either individuals or entire teams.</p>
+        </div>
+        <div class="card">
+            <h3>Progress Synchronization</h3>
+            <p>A real-time synchronization layer allows students to report completion percentages (0-100%) and manage milestones via integrated to-do lists, providing faculty with instant oversight.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>4. User Experience</h2>
+        <p>The interface follows a <strong>"Managed Portal"</strong> logic, utilizing a two-column distribution that separates navigational controls from core project streams. This ensures clarity even when managing multiple complex tasks.</p>
+    </section>
+
+    <footer>
+        &copy; 2026 KIIT Project Gateway. Generated by Antigravity AI.
+    </footer>
+</body>
+</html>
