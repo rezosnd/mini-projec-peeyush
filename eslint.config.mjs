@@ -1,43 +1,19 @@
-import { defineConfig, globalIgnores } from "eslint/config";
+import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+import { FlatCompat } from "@eslint/eslintrc";
 
-const importNextConfig = async (specifier, fallbackSpecifier) => {
-  try {
-    const mod = await import(specifier);
-    return mod.default ?? mod;
-  } catch (error) {
-    if (
-      error?.code === "ERR_MODULE_NOT_FOUND" ||
-      error?.code === "ERR_PACKAGE_PATH_NOT_EXPORTED"
-    ) {
-      const mod = await import(fallbackSpecifier);
-      return mod.default ?? mod;
-    }
-    throw error;
-  }
-};
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-const nextVitals = await importNextConfig(
-  "eslint-config-next/core-web-vitals",
-  "eslint-config-next/core-web-vitals.js"
-);
-const nextTs = await importNextConfig(
-  "eslint-config-next/typescript",
-  "eslint-config-next/typescript.js"
-);
+const compat = new FlatCompat({
+  baseDirectory: __dirname,
+});
 
-const asArray = (config) => (Array.isArray(config) ? config : [config]);
-
-const eslintConfig = defineConfig([
-  ...asArray(nextVitals),
-  ...asArray(nextTs),
-  // Override default ignores of eslint-config-next.
-  globalIgnores([
-    // Default ignores of eslint-config-next:
-    ".next/**",
-    "out/**",
-    "build/**",
-    "next-env.d.ts",
-  ]),
-]);
+const eslintConfig = [
+  ...compat.extends("next/core-web-vitals", "next/typescript"),
+  {
+    ignores: [".next/**", "out/**", "build/**", "next-env.d.ts"],
+  },
+];
 
 export default eslintConfig;
