@@ -86,6 +86,7 @@ export async function login(formData: FormData): Promise<ActionState | void> {
     }
 
     const { password: _password, ...sessionUser } = user;
+    void _password;
     await createSession(sessionUser);
     
   } catch (error) {
