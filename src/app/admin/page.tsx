@@ -1,11 +1,10 @@
-import { getSession } from '@/lib/auth';
 import { query } from '@/lib/db';
 import { logout } from '@/app/actions/auth';
 import EditUserForm from './EditUserForm';
+import type { UserRow } from '@/lib/types';
 
 export default async function AdminDashboard() {
-  const session = await getSession();
-  const usersRes = await query('SELECT id, role, name, roll_no FROM users ORDER BY role ASC, name ASC', []);
+  const usersRes = await query<UserRow>('SELECT id, role, name, roll_no FROM users ORDER BY role ASC, name ASC', []);
   const users = usersRes.rows;
 
   return (
@@ -36,7 +35,7 @@ export default async function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {users.map((u: any) => (
+                  {users.map((u) => (
                     <tr key={u.id}>
                       <td><span className="badge" style={{ background: 'rgba(255, 255, 255, 0.05)', color: 'var(--muted-fg)' }}>{u.role}</span></td>
                       <td style={{ fontWeight: 700, fontFamily: 'var(--font-display)', fontSize: '1rem' }}>{u.name}</td>

@@ -1,14 +1,15 @@
 'use client';
 
 import { login } from '@/app/actions/auth';
+import type { ActionState } from '@/lib/types';
 import Link from 'next/link';
 import { useActionState } from 'react';
 
-const initialState: any = { error: '' };
+const initialState: ActionState = { error: '' };
 
 export default function LoginForm() {
-  const [state, formAction, isPending] = useActionState(async (prevState: any, formData: FormData) => {
-    return await login(formData) || prevState;
+  const [state, formAction, isPending] = useActionState(async (prevState: ActionState, formData: FormData) => {
+    return (await login(formData)) || prevState;
   }, initialState);
 
   return (
@@ -47,7 +48,7 @@ export default function LoginForm() {
         </form>
 
         <p style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.875rem' }}>
-          Don't have an account? <Link href="/register" style={{ textDecoration: 'underline' }}>Register</Link>
+          Don&apos;t have an account? <Link href="/register" style={{ textDecoration: 'underline' }}>Register</Link>
         </p>
       </div>
     </div>

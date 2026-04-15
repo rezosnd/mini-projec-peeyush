@@ -1,13 +1,14 @@
 'use client';
 
 import { submitTask } from '@/app/actions/tasks';
+import type { ActionState } from '@/lib/types';
 import { useActionState } from 'react';
 
-const initialState: any = { error: '', success: false };
+const initialState: ActionState = { error: '', success: false };
 
-export default function SubmitTaskForm({ taskId }: { taskId: string }) {
-  const [state, formAction, isPending] = useActionState(async (prevState: any, formData: FormData) => {
-    return await submitTask(formData) || prevState;
+export default function SubmitTaskForm({ taskId }: { taskId: string | number }) {
+  const [state, formAction, isPending] = useActionState(async (prevState: ActionState, formData: FormData) => {
+    return (await submitTask(formData)) || prevState;
   }, initialState);
 
   return (

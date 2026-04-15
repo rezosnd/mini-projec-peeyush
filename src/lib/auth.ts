@@ -1,11 +1,11 @@
 import { jwtVerify, SignJWT } from 'jose';
 import { cookies } from 'next/headers';
-import { NextRequest } from 'next/server';
+import type { SessionPayload, SessionUser } from './types';
 
 const secretKey = process.env.JWT_SECRET || 'fallback-secret-for-development';
 const key = new TextEncoder().encode(secretKey);
 
-export async function encrypt(payload: any) {
+export async function encrypt(payload: SessionPayload) {
   return await new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
@@ -13,11 +13,11 @@ export async function encrypt(payload: any) {
     .sign(key);
 }
 
-export async function decrypt(input: string): Promise<any> {
+export async function decrypt(input: string): Promise<SessionPayload> {
   const { payload } = await jwtVerify(input, key, {
     algorithms: ['HS256'],
   });
-  return payload;
+  return payload as SessionPayload;
 }
 
 export async function getSession() {
@@ -26,12 +26,12 @@ export async function getSession() {
   if (!session) return null;
   try {
     return await decrypt(session);
-  } catch (error) {
+  } catch {
     return null;
   }
 }
 
-export async function createSession(userData: any) {
+export async function createSession(userData: SessionUser) {
   const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 1 day
   const session = await encrypt({ user: userData, expires });
   

@@ -1,13 +1,14 @@
 'use client';
 
 import { createGroup, addMemberToGroup } from '@/app/actions/groups';
+import type { ActionState, GroupRow } from '@/lib/types';
 import { useActionState, useState } from 'react';
 
-export default function GroupManager({ userGroups }: { userGroups: any[] }) {
+export default function GroupManager({ userGroups }: { userGroups: GroupRow[] }) {
   const [activeTab, setActiveTab] = useState('create');
   
-  const [createState, createAction, isCreating] = useActionState(async (prev: any, fd: FormData) => await createGroup(fd) || prev, { error: '' });
-  const [addState, addAction, isAdding] = useActionState(async (prev: any, fd: FormData) => await addMemberToGroup(fd) || prev, { error: '' });
+  const [createState, createAction, isCreating] = useActionState(async (prev: ActionState, fd: FormData) => (await createGroup(fd)) || prev, { error: '' });
+  const [addState, addAction, isAdding] = useActionState(async (prev: ActionState, fd: FormData) => (await addMemberToGroup(fd)) || prev, { error: '' });
 
   return (
     <div className="card" style={{maxWidth: '100%'}}>

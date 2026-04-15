@@ -1,15 +1,16 @@
 'use client';
 
 import { register } from '@/app/actions/auth';
+import type { ActionState } from '@/lib/types';
 import Link from 'next/link';
 import { useActionState, useState } from 'react';
 
-const initialState: any = { error: '' };
+const initialState: ActionState = { error: '' };
 
 export default function RegisterForm() {
   const [role, setRole] = useState('STUDENT');
-  const [state, formAction, isPending] = useActionState(async (prevState: any, formData: FormData) => {
-    return await register(formData) || prevState;
+  const [state, formAction, isPending] = useActionState(async (prevState: ActionState, formData: FormData) => {
+    return (await register(formData)) || prevState;
   }, initialState);
 
   return (

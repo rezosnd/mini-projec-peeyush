@@ -1,10 +1,12 @@
 'use server';
 
+import bcrypt from 'bcrypt';
 import { query } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
+import type { ActionState, IdRow } from '@/lib/types';
 
-export async function assignTask(formData: FormData) {
+export async function assignTask(formData: FormData): Promise<ActionState> {
   const session = await getSession();
   if (!session || session.user.role !== 'TEACHER') {
     return { error: 'Unauthorized' };
@@ -23,7 +25,7 @@ export async function assignTask(formData: FormData) {
 
   try {
     if (assigneeType === 'STUDENT') {
-      const studentRes = await query('SELECT id FROM users WHERE roll_no = $1 AND role = $2', [assigneeValue, 'STUDENT']);
+      const studentRes = await query<IdRow>('SELECT id FROM users WHERE roll_no = $1 AND role = $2', [assigneeValue, 'STUDENT']);
       if (!studentRes.rowCount || studentRes.rowCount === 0) {
         return { error: 'Student with given roll number not found' };
       }
@@ -33,7 +35,7 @@ export async function assignTask(formData: FormData) {
         [teacher_id, student_id, title, description]
       );
     } else if (assigneeType === 'GROUP') {
-      const groupRes = await query('SELECT id FROM student_groups WHERE name = $1', [assigneeValue]);
+      const groupRes = await query<IdRow>('SELECT id FROM student_groups WHERE name = $1', [assigneeValue]);
       if (!groupRes.rowCount || groupRes.rowCount === 0) {
         return { error: 'Group with given name not found' };
       }
@@ -48,13 +50,13 @@ export async function assignTask(formData: FormData) {
 
     revalidatePath('/teacher');
     return { success: true };
-  } catch (e: any) {
-    console.error(e);
+  } catch (error) {
+    console.error(error);
     return { error: 'Failed to assign task' };
   }
 }
 
-export async function submitTask(formData: FormData) {
+export async function submitTask(formData: FormData): Promise<ActionState> {
   const session = await getSession();
   if (!session || session.user.role !== 'STUDENT') {
     return { error: 'Unauthorized' };
@@ -78,13 +80,13 @@ export async function submitTask(formData: FormData) {
 
     revalidatePath('/student');
     return { success: true };
-  } catch (e: any) {
-    console.error(e);
+  } catch (error) {
+    console.error(error);
     return { error: 'Failed to submit task' };
   }
 }
 
-export async function adminUpdateUser(formData: FormData) {
+export async function adminUpdateUser(formData: FormData): Promise<ActionState> {
   const session = await getSession();
   if (!session || session.user.role !== 'ADMIN') {
     return { error: 'Unauthorized' };
@@ -97,23 +99,21 @@ export async function adminUpdateUser(formData: FormData) {
 
   try {
     if (newPassword) {
-        import('bcrypt').then(async (bcrypt) => {
-            const hashed = await bcrypt.hash(newPassword, 10);
-            await query('UPDATE users SET name = $1, roll_no = $2, password = $3 WHERE id = $4', [newName, newRollNo, hashed, user_id]);
-        });
+      const hashed = await bcrypt.hash(newPassword, 10);
+      await query('UPDATE users SET name = $1, roll_no = $2, password = $3 WHERE id = $4', [newName, newRollNo, hashed, user_id]);
     } else {
-        await query('UPDATE users SET name = $1, roll_no = $2 WHERE id = $3', [newName, newRollNo, user_id]);
+      await query('UPDATE users SET name = $1, roll_no = $2 WHERE id = $3', [newName, newRollNo, user_id]);
     }
     
     revalidatePath('/admin');
     return { success: true };
-  } catch (e: any) {
-    console.error(e);
+  } catch (error) {
+    console.error(error);
     return { error: 'Failed to update user' };
   }
 }
 
-export async function updateTaskProgress(formData: FormData) {
+export async function updateTaskProgress(formData: FormData): Promise<ActionState> {
   const session = await getSession();
   if (!session || session.user.role !== 'STUDENT') return { error: 'Unauthorized' };
 
@@ -126,12 +126,13 @@ export async function updateTaskProgress(formData: FormData) {
     await query(`UPDATE tasks SET progress = $1 WHERE id = $2 AND (student_id = $3 OR group_id IN (SELECT group_id FROM student_group_members WHERE student_id = $3))`, [progress, task_id, session.user.id]);
     revalidatePath('/student');
     return { success: true };
-  } catch(e) {
+  } catch (error) {
+    console.error(error);
     return { error: 'Failed' };
   }
 }
 
-export async function addTodo(formData: FormData) {
+export async function addTodo(formData: FormData): Promise<ActionState> {
   const session = await getSession();
   if (!session || session.user.role !== 'STUDENT') return { error: 'Unauthorized' };
   const task_id = formData.get('task_id') as string;
@@ -141,10 +142,13 @@ export async function addTodo(formData: FormData) {
     await query('INSERT INTO task_todos (task_id, description) VALUES ($1, $2)', [task_id, description]);
     revalidatePath('/student');
     return { success: true };
-  } catch(e) { return { error: 'Failed' }; }
+  } catch (error) {
+    console.error(error);
+    return { error: 'Failed' };
+  }
 }
 
-export async function toggleTodo(formData: FormData) {
+export async function toggleTodo(formData: FormData): Promise<ActionState> {
   const session = await getSession();
   if (!session || session.user.role !== 'STUDENT') return { error: 'Unauthorized' };
   const todo_id = formData.get('todo_id') as string;
@@ -153,5 +157,8 @@ export async function toggleTodo(formData: FormData) {
     await query('UPDATE task_todos SET is_completed = $1 WHERE id = $2', [is_completed, todo_id]);
     revalidatePath('/student');
     return { success: true };
-  } catch(e) { return { error: 'Failed' }; }
+  } catch (error) {
+    console.error(error);
+    return { error: 'Failed' };
+  }
 }

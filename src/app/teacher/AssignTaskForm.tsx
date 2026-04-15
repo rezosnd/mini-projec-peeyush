@@ -1,13 +1,14 @@
 'use client';
 
 import { assignTask } from '@/app/actions/tasks';
+import type { ActionState } from '@/lib/types';
 import { useActionState, useEffect, useRef, useState } from 'react';
 
-const initialState: any = { error: '', success: false };
+const initialState: ActionState = { error: '', success: false };
 
 export default function AssignTaskForm() {
-  const [state, formAction, isPending] = useActionState(async (prevState: any, formData: FormData) => {
-    return await assignTask(formData) || prevState;
+  const [state, formAction, isPending] = useActionState(async (prevState: ActionState, formData: FormData) => {
+    return (await assignTask(formData)) || prevState;
   }, initialState);
 
   const formRef = useRef<HTMLFormElement>(null);

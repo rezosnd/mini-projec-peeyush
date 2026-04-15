@@ -3,8 +3,9 @@
 import { query } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
+import type { ActionState, IdRow } from '@/lib/types';
 
-export async function createGroup(formData: FormData) {
+export async function createGroup(formData: FormData): Promise<ActionState> {
   const session = await getSession();
   if (!session || session.user.role !== 'STUDENT') {
     return { error: 'Unauthorized' };
@@ -17,12 +18,12 @@ export async function createGroup(formData: FormData) {
 
   try {
     // Note: This relies on manual rollback if we had a full transaction, but since we are simple we run sequentially
-    const existingGroup = await query('SELECT id FROM student_groups WHERE name = $1', [name]);
+    const existingGroup = await query<IdRow>('SELECT id FROM student_groups WHERE name = $1', [name]);
     if (existingGroup.rowCount && existingGroup.rowCount > 0) {
       return { error: 'Group name already taken' };
     }
 
-    const newGroup = await query(
+    const newGroup = await query<IdRow>(
       'INSERT INTO student_groups (name, created_by) VALUES ($1, $2) RETURNING id',
       [name, session.user.id]
     );
@@ -33,7 +34,7 @@ export async function createGroup(formData: FormData) {
 
     // Add peer if provided
     if (peerRollNo) {
-      const peerRes = await query('SELECT id FROM users WHERE roll_no = $1 AND role = $2', [peerRollNo, 'STUDENT']);
+      const peerRes = await query<IdRow>('SELECT id FROM users WHERE roll_no = $1 AND role = $2', [peerRollNo, 'STUDENT']);
       if (peerRes.rowCount && peerRes.rowCount > 0) {
         await query('INSERT INTO student_group_members (group_id, student_id) VALUES ($1, $2)', [groupId, peerRes.rows[0].id]);
       }
@@ -41,13 +42,13 @@ export async function createGroup(formData: FormData) {
 
     revalidatePath('/student');
     return { success: true };
-  } catch (e: any) {
-    console.error(e);
+  } catch (error) {
+    console.error(error);
     return { error: 'Failed to create group' };
   }
 }
 
-export async function addMemberToGroup(formData: FormData) {
+export async function addMemberToGroup(formData: FormData): Promise<ActionState> {
   const session = await getSession();
   if (!session || session.user.role !== 'STUDENT') {
     return { error: 'Unauthorized' };
@@ -59,7 +60,7 @@ export async function addMemberToGroup(formData: FormData) {
   if (!groupId || !rollNo) return { error: 'Missing required fields' };
 
   try {
-    const peerRes = await query('SELECT id FROM users WHERE roll_no = $1 AND role = $2', [rollNo, 'STUDENT']);
+    const peerRes = await query<IdRow>('SELECT id FROM users WHERE roll_no = $1 AND role = $2', [rollNo, 'STUDENT']);
     if (!peerRes.rowCount || peerRes.rowCount === 0) {
       return { error: 'Student not found' };
     }
@@ -69,8 +70,8 @@ export async function addMemberToGroup(formData: FormData) {
 
     revalidatePath('/student');
     return { success: true };
-  } catch (e: any) {
-    console.error(e);
+  } catch (error) {
+    console.error(error);
     return { error: 'Failed to add member' };
   }
 }

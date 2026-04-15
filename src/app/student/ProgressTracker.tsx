@@ -1,17 +1,18 @@
 'use client';
 
 import { updateTaskProgress, addTodo, toggleTodo } from '@/app/actions/tasks';
+import type { ActionState, TaskRow, TodoRow } from '@/lib/types';
 import { useActionState, useRef } from 'react';
 
-export default function ProgressTracker({ task, todos }: { task: any, todos: any[] }) {
-  const [progState, progAction, isSavingProg] = useActionState(async (p: any, fd: FormData) => {
+export default function ProgressTracker({ task, todos }: { task: TaskRow; todos: TodoRow[] }) {
+  const [, progAction, isSavingProg] = useActionState(async (prevState: ActionState, fd: FormData) => {
     const res = await updateTaskProgress(fd);
-    return res || p;
+    return res || prevState;
   }, { error: '' });
 
-  const [addTodoState, addTodoAction, isAddingTodo] = useActionState(async (p: any, fd: FormData) => {
+  const [, addTodoAction, isAddingTodo] = useActionState(async (prevState: ActionState, fd: FormData) => {
     const res = await addTodo(fd);
-    return res || p;
+    return res || prevState;
   }, { error: '' });
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -26,8 +27,8 @@ export default function ProgressTracker({ task, todos }: { task: any, todos: any
         <input type="hidden" name="task_id" value={task.id} />
         <div style={{flexGrow: 1}}>
           <label className="form-label" style={{fontSize: '0.75rem'}}>Completion %</label>
-          <input type="range" name="progress" min="0" max="100" defaultValue={task.progress} style={{width: '100%'}} />
-          <div style={{fontSize: '0.75rem', textAlign: 'right'}}>{task.progress}% current</div>
+          <input type="range" name="progress" min="0" max="100" defaultValue={task.progress ?? 0} style={{width: '100%'}} />
+          <div style={{fontSize: '0.75rem', textAlign: 'right'}}>{task.progress ?? 0}% current</div>
         </div>
         <button type="submit" className="btn btn-primary btn-sm" disabled={isSavingProg} style={{width: 'auto'}}>Save</button>
       </form>

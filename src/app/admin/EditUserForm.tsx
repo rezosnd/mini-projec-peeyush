@@ -1,13 +1,14 @@
 'use client';
 
 import { adminUpdateUser } from '@/app/actions/tasks';
+import type { ActionState, UserRow } from '@/lib/types';
 import { useActionState, useState } from 'react';
 
-const initialState: any = { error: '', success: false };
+const initialState: ActionState = { error: '', success: false };
 
-export default function EditUserForm({ user }: { user: any }) {
+export default function EditUserForm({ user }: { user: UserRow }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [state, formAction, isPending] = useActionState(async (prevState: any, formData: FormData) => {
+  const [state, formAction, isPending] = useActionState(async (prevState: ActionState, formData: FormData) => {
     const res = await adminUpdateUser(formData);
     if (res?.success) setIsOpen(false);
     return res || prevState;

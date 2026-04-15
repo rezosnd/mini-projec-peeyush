@@ -2,9 +2,14 @@ import { getSession } from '@/lib/auth';
 import { query } from '@/lib/db';
 import { logout } from '@/app/actions/auth';
 import AssignTaskForm from './AssignTaskForm';
+import type { TaskRow } from '@/lib/types';
+import { redirect } from 'next/navigation';
 
 export default async function TeacherDashboard() {
   const session = await getSession();
+  if (!session) {
+    redirect('/login');
+  }
   const teacherId = session.user.id;
 
   const tasksStr = `
@@ -15,7 +20,7 @@ export default async function TeacherDashboard() {
     WHERE t.teacher_id = $1
     ORDER BY t.created_at DESC
   `;
-  const tasksRes = await query(tasksStr, [teacherId]);
+  const tasksRes = await query<TaskRow>(tasksStr, [teacherId]);
   const tasks = tasksRes.rows;
 
   return (
@@ -58,7 +63,7 @@ export default async function TeacherDashboard() {
               </div>
             ) : (
               <div className="portal-list">
-                {tasks.map((task: any) => (
+                {tasks.map((task) => (
                   <div key={task.id} className="card task-card">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
                       <div className="task-title" style={{ fontSize: '1.1rem' }}>{task.title}</div>
@@ -88,9 +93,9 @@ export default async function TeacherDashboard() {
                       <div style={{ marginTop: 'auto', paddingTop: '1.25rem', borderTop: '1px solid var(--border)' }}>
                         <span className="label-managed">Review Assets</span>
                         <div className="submission-links">
-                          <a href={task.submission_ppt} target="_blank" rel="noreferrer">Project Presentation (PPT)</a>
-                          <a href={task.submission_report} target="_blank" rel="noreferrer">Technical Report (PDF)</a>
-                          <a href={task.submission_github} target="_blank" rel="noreferrer">Source Repository</a>
+                          <a href={task.submission_ppt ?? '#'} target="_blank" rel="noreferrer">Project Presentation (PPT)</a>
+                          <a href={task.submission_report ?? '#'} target="_blank" rel="noreferrer">Technical Report (PDF)</a>
+                          <a href={task.submission_github ?? '#'} target="_blank" rel="noreferrer">Source Repository</a>
                         </div>
                       </div>
                     ) : (

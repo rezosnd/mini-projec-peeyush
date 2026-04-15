@@ -4,13 +4,18 @@ import { logout } from '@/app/actions/auth';
 import SubmitTaskForm from './SubmitTaskForm';
 import GroupManager from './GroupManager';
 import ProgressTracker from './ProgressTracker';
+import type { GroupRow, TaskRow, TodoRow } from '@/lib/types';
+import { redirect } from 'next/navigation';
 
 export default async function StudentDashboard() {
   const session = await getSession();
+  if (!session) {
+    redirect('/login');
+  }
   const studentId = session.user.id;
 
   // Fetch groups
-  const groupsRes = await query(`
+  const groupsRes = await query<GroupRow>(`
     SELECT g.id, g.name 
     FROM student_groups g
     JOIN student_group_members gm ON g.id = gm.group_id
@@ -27,15 +32,15 @@ export default async function StudentDashboard() {
     WHERE t.student_id = $1 OR t.group_id IN (SELECT group_id FROM student_group_members WHERE student_id = $1)
     ORDER BY t.created_at DESC
   `;
-  const tasksRes = await query(tasksStr, [studentId]);
+  const tasksRes = await query<TaskRow>(tasksStr, [studentId]);
   const tasks = tasksRes.rows;
 
   // Fetch all todos for these tasks and group them
-  let allTodos: any[] = [];
+  let allTodos: TodoRow[] = [];
   if (tasks.length > 0) {
-    const taskIds = tasks.map((t: any) => t.id);
-    const placeholders = taskIds.map((_: any, i: number) => `$${i + 1}`).join(',');
-    const todosRes = await query(`SELECT * FROM task_todos WHERE task_id IN (${placeholders}) ORDER BY created_at ASC`, taskIds);
+    const taskIds = tasks.map((t) => t.id);
+    const placeholders = taskIds.map((_, i: number) => `$${i + 1}`).join(',');
+    const todosRes = await query<TodoRow>(`SELECT * FROM task_todos WHERE task_id IN (${placeholders}) ORDER BY created_at ASC`, taskIds);
     allTodos = todosRes.rows;
   }
 
@@ -79,7 +84,7 @@ export default async function StudentDashboard() {
               </div>
             ) : (
               <div className="portal-list">
-                {tasks.map((task: any) => {
+                {tasks.map((task) => {
                   const taskTodos = allTodos.filter(t => t.task_id === task.id);
                   return (
                     <div key={task.id} className="card task-card">
@@ -114,9 +119,9 @@ export default async function StudentDashboard() {
                         <div style={{ marginTop: 'auto', paddingTop: '1.25rem', borderTop: '1px solid var(--border)' }}>
                           <span className="label-managed" style={{ color: '#00f2fe' }}>Synchronization Complete</span>
                           <div className="submission-links">
-                            <a href={task.submission_ppt} target="_blank" rel="noreferrer">Project Presentation (PPT)</a>
-                            <a href={task.submission_report} target="_blank" rel="noreferrer">Technical Report (PDF)</a>
-                            <a href={task.submission_github} target="_blank" rel="noreferrer">Source Repository</a>
+                            <a href={task.submission_ppt ?? '#'} target="_blank" rel="noreferrer">Project Presentation (PPT)</a>
+                            <a href={task.submission_report ?? '#'} target="_blank" rel="noreferrer">Technical Report (PDF)</a>
+                            <a href={task.submission_github ?? '#'} target="_blank" rel="noreferrer">Source Repository</a>
                           </div>
                         </div>
                       )}
